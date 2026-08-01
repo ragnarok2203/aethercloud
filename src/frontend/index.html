@@ -55,6 +55,16 @@
         <span>⚡</span> <span>Simulate Attack</span>
       </button>
 
+      <!-- SLA Analytics Pill -->
+      <button class="ctrl-btn" id="btn-sla-modal" style="border-color: var(--accent-cyan); color: var(--accent-cyan);" title="View 99.999% SLA & System Health Analytics">
+        <span>📈</span> <span>SLA: 99.999%</span>
+      </button>
+
+      <!-- Audit Log Export Button -->
+      <button class="ctrl-btn" id="btn-export-csv" title="Export Live Audit Log CSV Report">
+        <span>📥</span> <span>Export CSV</span>
+      </button>
+
       <!-- Cyber Theme Selector -->
       <select class="ctrl-select" id="sel-cyber-theme">
         <option value="theme-cyber">Theme: Cyber Blue</option>
@@ -148,6 +158,25 @@
               <canvas id="chart-node-loads"></canvas>
             </div>
           </div>
+
+          <!-- Live System Log Stream Console -->
+          <div class="glass-box" style="grid-column: span 2; margin-top: 1rem;">
+            <div class="box-title" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+              <span>📜 Real-Time System & Security Log Feed</span>
+              <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <select class="ctrl-select" id="sel-log-filter" style="padding: 0.25rem 0.6rem; font-size: 0.75rem;">
+                  <option value="ALL">Filter: All Logs</option>
+                  <option value="SECURITY">Filter: Security Alerts</option>
+                  <option value="AUTOSCALE">Filter: Node Scaling</option>
+                  <option value="INFO">Filter: Telemetry Info</option>
+                </select>
+                <button class="ctrl-btn" id="btn-clear-logs" style="padding: 0.25rem 0.6rem; font-size: 0.75rem;">Clear Logs</button>
+              </div>
+            </div>
+            <div id="log-feed-container" style="background: rgba(5, 8, 17, 0.85); border: 1px solid var(--border-color); border-radius: 10px; padding: 0.85rem; font-family: var(--font-mono); font-size: 0.8rem; max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.45rem;">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
         </div>
       </section>
 
@@ -238,8 +267,33 @@ Type 'help' to view available system commands.
         <p style="color: var(--text-muted);">Loading threat details...</p>
       </div>
       <div class="modal-actions">
-        <button type="button" class="ctrl-btn" id="btn-close-threat-modal">Close Inspector</button>
-        <button type="button" class="action-btn" id="btn-modal-mitigate-all">🛡 Mitigate All Threats</button>
+  <!-- Glass Modal: SLA & Reliability Analytics -->
+  <div class="modal-wrapper" id="modal-sla-analytics">
+    <div class="glass-modal" style="max-width: 560px;">
+      <div class="modal-title" style="color: var(--accent-cyan);">📈 SLA & Reliability Analytics Console</div>
+      <div class="modal-body">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem;">
+          <div style="background: rgba(255,255,255,0.04); padding: 1rem; border-radius: 12px; border: 1px solid var(--border-color);">
+            <div style="font-size: 0.75rem; color: var(--text-muted);">GLOBAL AVAILABILITY</div>
+            <div style="font-size: 1.6rem; font-weight: 800; color: var(--success-color);">99.999%</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem;">Zero unplanned downtime</div>
+          </div>
+          <div style="background: rgba(255,255,255,0.04); padding: 1rem; border-radius: 12px; border: 1px solid var(--border-color);">
+            <div style="font-size: 0.75rem; color: var(--text-muted);">MTTR (THREAT MITIGATION)</div>
+            <div style="font-size: 1.6rem; font-weight: 800; color: var(--accent-primary);">1.25s</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem;">Autonomous AI Firewall response</div>
+          </div>
+        </div>
+        <div style="background: rgba(255,255,255,0.02); padding: 1rem; border-radius: 12px; border: 1px solid var(--border-color); font-size: 0.85rem; line-height: 1.6;">
+          <div style="font-weight: 700; color: #fff; margin-bottom: 0.5rem;">☸ Multi-Cloud Mesh SLA Report</div>
+          <div>• <strong>AWS Mesh Nodes</strong>: 100% operational | Average Latency: 18ms</div>
+          <div>• <strong>Azure Sovereign Core</strong>: 100% operational | Average Latency: 24ms</div>
+          <div>• <strong>GCP Quantum Nodes</strong>: 100% operational | Average Latency: 15ms</div>
+          <div style="margin-top: 0.5rem; color: var(--accent-cyan);">• <strong>Packets Processed</strong>: <span id="sla-packets-count">8,420</span> continuous mesh data packets</div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="ctrl-btn" id="btn-close-sla-modal">Close Analytics</button>
       </div>
     </div>
   </div>

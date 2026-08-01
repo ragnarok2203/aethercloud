@@ -94,6 +94,26 @@ document.addEventListener('DOMContentLoaded', () => {
     mitigateAllThreats();
     modalThreatInspector.classList.remove('active');
   });
+
+  // SLA Modal Controls
+  const btnSla = document.getElementById('btn-sla-modal');
+  const btnCloseSla = document.getElementById('btn-close-sla-modal');
+  const modalSla = document.getElementById('modal-sla-analytics');
+  if (btnSla) btnSla.addEventListener('click', () => modalSla.classList.add('active'));
+  if (btnCloseSla) btnCloseSla.addEventListener('click', () => modalSla.classList.remove('active'));
+
+  // CSV Export Button
+  const btnExport = document.getElementById('btn-export-csv');
+  if (btnExport) btnExport.addEventListener('click', exportAuditCSV);
+
+  // Log Feed Controls
+  const selLogFilter = document.getElementById('sel-log-filter');
+  const btnClearLogs = document.getElementById('btn-clear-logs');
+  if (selLogFilter) selLogFilter.addEventListener('change', (e) => filterLogs(e.target.value));
+  if (btnClearLogs) btnClearLogs.addEventListener('click', clearLogs);
+
+  // Render Initial Logs
+  renderLogs();
 });
 
 // Toast Shelf Helper
@@ -502,6 +522,14 @@ async function fetchRealTimeData() {
     if (elThr) elThr.innerText = data.metrics.activeThreatsCount;
     if (elCpu) elCpu.innerText = `${data.metrics.cpuLoadAvg}% / ${data.metrics.memoryLoadAvg}%`;
 
+    const elSlaPkts = document.getElementById('sla-packets-count');
+    if (elSlaPkts && data.totalPacketsProcessed) elSlaPkts.innerText = data.totalPacketsProcessed.toLocaleString();
+
+    // Auto log stream sample
+    if (Math.random() < 0.4) {
+      addLogEntry('INFO', `[TELEMETRY STREAM]: Bandwidth ${data.metrics.throughputGbps} Gbps | Ping Latency ${data.metrics.avgLatencyMs}ms | Host CPU ${data.metrics.cpuLoadAvg}%`);
+    }
+
     // 2. Update Charts Safely
     try {
       if (chartRealtimeThroughput && data.history) {
@@ -610,6 +638,70 @@ function renderNodeTable(nodes) {
   `).join('');
 }
 
+let systemLogStore = [
+  { level: 'INFO', time: new Date().toLocaleTimeString(), msg: 'Telemetry streaming engine active on port 5000.' },
+  { level: 'SECURITY', time: new Date().toLocaleTimeString(), msg: 'AI Sentinel firewall initialized across AWS, Azure, GCP.' },
+  { level: 'AUTOSCALE', time: new Date().toLocaleTimeString(), msg: 'Cluster node load balancer synchronized.' }
+];
+let currentLogFilter = 'ALL';
+
+function addLogEntry(level, msg) {
+  const entry = { level, time: new Date().toLocaleTimeString(), msg };
+  systemLogStore.unshift(entry);
+  if (systemLogStore.length > 50) systemLogStore.pop();
+  renderLogs();
+}
+
+function renderLogs() {
+  const container = document.getElementById('log-feed-container');
+  if (!container) return;
+
+  const filtered = currentLogFilter === 'ALL'
+    ? systemLogStore
+    : systemLogStore.filter(l => l.level === currentLogFilter);
+
+  if (filtered.length === 0) {
+    container.innerHTML = '<div style="color: var(--text-muted); text-align: center; padding: 0.5rem;">No logs matching filter.</div>';
+    return;
+  }
+
+  container.innerHTML = filtered.map(l => {
+    let color = '#38bdf8';
+    if (l.level === 'SECURITY' || l.level === 'CRITICAL') color = '#f87171';
+    if (l.level === 'AUTOSCALE') color = '#fbbf24';
+
+    return `<div style="display: flex; gap: 0.5rem; word-break: break-all;"><span style="color: var(--text-muted);">[${l.time}]</span> <strong style="color: ${color};">[${l.level}]:</strong> <span style="color: #cbd5e1;">${l.msg}</span></div>`;
+  }).join('');
+}
+
+function filterLogs(level) {
+  currentLogFilter = level;
+  renderLogs();
+}
+
+function clearLogs() {
+  systemLogStore = [];
+  renderLogs();
+  showToast('System log console cleared.', 'Logs Cleared');
+}
+
+function exportAuditCSV() {
+  let csvContent = 'data:text/csv;charset=utf-8,Timestamp,Log Level,Event Details\n';
+  systemLogStore.forEach(l => {
+    csvContent += `"${l.time}","${l.level}","${l.msg.replace(/"/g, '""')}"\n`;
+  });
+
+  const encodedUri = encodeURI(csvContent);
+  const link = document.createElement('a');
+  link.setAttribute('href', encodedUri);
+  link.setAttribute('download', `aethercloud-audit-report-${Date.now()}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+
+  showToast('Audit log CSV report downloaded successfully.', 'Export Complete');
+}
+
 window.mitigateSingleThreat = async function(threatId) {
   try {
     const res = await fetch('/api/action/mitigate', {
@@ -619,6 +711,7 @@ window.mitigateSingleThreat = async function(threatId) {
     });
     const data = await res.json();
     showToast(data.message, 'Threat Neutralized');
+    addLogEntry('SECURITY', `[MITIGATED]: Cyber threat [${threatId}] neutralized by AI Sentinel.`);
     fetchRealTimeData();
   } catch (err) {
     showToast('Failed to mitigate threat.', 'Error');
@@ -634,9 +727,10 @@ window.rebalanceNode = async function(nodeId) {
     });
     const data = await res.json();
     showToast(data.message, 'Node Rebalanced');
+    addLogEntry('AUTOSCALE', `[AUTOSCALE]: Node [${nodeId}] rebalanced. Cluster load decreased by 25%.`);
     fetchRealTimeData();
   } catch (err) {
-    showToast('Failed to scale node.', 'Error');
+    showToast('Failed to rebalance node.', 'Error');
   }
 };
 
