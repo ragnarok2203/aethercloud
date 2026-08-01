@@ -268,6 +268,10 @@ let chartThreatVectors = null;
 let chartNodeLoads = null;
 
 function initCharts() {
+  if (typeof Chart === 'undefined') {
+    console.warn('Chart.js library not detected');
+    return;
+  }
   // Line Graph: Network Throughput & Latency
   const ctxLine = document.getElementById('chart-realtime-throughput');
   if (ctxLine) {
@@ -418,33 +422,40 @@ function changeStreamInterval(e) {
 async function fetchRealTimeData() {
   try {
     const res = await fetch('/api/realtime/stream');
+    if (!res.ok) return;
     const data = await res.json();
 
-    // Update Header Metric Cards
-    document.getElementById('val-throughput').innerText = `${data.metrics.throughputGbps} Gbps`;
-    document.getElementById('val-latency').innerText = `${data.metrics.avgLatencyMs} ms`;
-    document.getElementById('val-threats').innerText = data.metrics.activeThreatsCount;
-    document.getElementById('val-cpu-ram').innerText = `${data.metrics.cpuLoadAvg}% / ${data.metrics.memoryLoadAvg}%`;
+    // 1. Update Header Metric Cards
+    const elTp = document.getElementById('val-throughput');
+    const elLat = document.getElementById('val-latency');
+    const elThr = document.getElementById('val-threats');
+    const elCpu = document.getElementById('val-cpu-ram');
 
-    // Update Line Chart (Throughput & Latency)
-    if (chartRealtimeThroughput && data.history) {
-      chartRealtimeThroughput.data.labels = data.history.map(h => h.time);
-      chartRealtimeThroughput.data.datasets[0].data = data.history.map(h => h.throughputGbps);
-      chartRealtimeThroughput.data.datasets[1].data = data.history.map(h => h.avgLatencyMs);
-      chartRealtimeThroughput.update('none');
+    if (elTp) elTp.innerText = `${data.metrics.throughputGbps} Gbps`;
+    if (elLat) elLat.innerText = `${data.metrics.avgLatencyMs} ms`;
+    if (elThr) elThr.innerText = data.metrics.activeThreatsCount;
+    if (elCpu) elCpu.innerText = `${data.metrics.cpuLoadAvg}% / ${data.metrics.memoryLoadAvg}%`;
+
+    // 2. Update Charts Safely
+    try {
+      if (chartRealtimeThroughput && data.history) {
+        chartRealtimeThroughput.data.labels = data.history.map(h => h.time);
+        chartRealtimeThroughput.data.datasets[0].data = data.history.map(h => h.throughputGbps);
+        chartRealtimeThroughput.data.datasets[1].data = data.history.map(h => h.avgLatencyMs);
+        chartRealtimeThroughput.update('none');
+      }
+
+      if (chartNodeLoads && data.nodes) {
+        chartNodeLoads.data.labels = data.nodes.map(n => n.name);
+        chartNodeLoads.data.datasets[0].data = data.nodes.map(n => n.load);
+        chartNodeLoads.update('none');
+      }
+    } catch (cErr) {
+      console.warn('Chart update exception:', cErr);
     }
 
-    // Update Node Loads Bar Chart
-    if (chartNodeLoads && data.nodes) {
-      chartNodeLoads.data.labels = data.nodes.map(n => n.name);
-      chartNodeLoads.data.datasets[0].data = data.nodes.map(n => n.load);
-      chartNodeLoads.update('none');
-    }
-
-    // Update Security Stream
+    // 3. Update Security Stream & Node Table
     renderThreatStream(data.threats);
-
-    // Update Node Inventory Table
     renderNodeTable(data.nodes);
 
   } catch (err) {
