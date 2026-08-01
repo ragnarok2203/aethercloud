@@ -24,9 +24,3 @@ Access the live platform online:
 - ⚡ **Interactive Cyber Attack Simulator**: 1-click synthetic attack injection for live technical demos.
 - 🎨 **Multi-Theme Palette Engine**: Switch seamlessly between **Cyber Blue**, **Cyberpunk Pink**, and **Emerald Matrix** modes.
 - 📱 **100% Mobile & Device Responsive**: Slide-over mobile drawer navigation, fluid CSS grids, and responsive chart scaling.
-
----
-
-## 📑 Technical Specifications
-
-For system architecture diagrams, REST API specifications, and performance analysis, view the [Project Report](PROJECT_REPORT.md).
