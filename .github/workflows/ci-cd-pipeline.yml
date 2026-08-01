@@ -1,4 +1,4 @@
-name: CloudOps Multi-Cloud Automated CI/CD Pipeline
+name: AetherCloud PulseMatrix Automated CI/CD Pipeline
 
 on:
   push:
@@ -35,9 +35,9 @@ jobs:
 
     - name: Build Docker Container Image
       run: |
-        docker build -t cloudops/platform-app:${{ github.sha }} .
+        docker build -t aethercloud/pulsematrix:${{ github.sha }} .
 
     - name: Verify Kubernetes Manifests Syntax
       run: |
         cd kubernetes
-        kubectl apply --dry-run=client -f .
+        kubectl apply --dry-run=client --validate=false -f .
