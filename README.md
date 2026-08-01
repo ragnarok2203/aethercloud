@@ -4,7 +4,7 @@
 [![Cyber Security Matrix](https://img.shields.io/badge/Security-AI--Sentinel-indigo.svg)]()
 [![Canvas Network Topology](https://img.shields.io/badge/Topology-Interactive--Canvas-blue.svg)]()
 
-> **AetherCloud PulseMatrix** is an enterprise-grade, attention-seeking **Real-Time Autonomous Multi-Cloud & Cyber Security Telemetry Platform**. It features sub-second live streaming telemetry data, interactive Canvas network topology animations, real-time Chart.js graph curves, an interactive Cyber Terminal CLI, and 100% device responsiveness.
+> **AetherCloud PulseMatrix** is an enterprise-grade **Real-Time Autonomous Multi-Cloud & Cyber Security Telemetry Platform**. It features sub-second live streaming telemetry data, interactive Canvas network topology animations, real-time Chart.js graph curves, an interactive Cyber Terminal CLI, and 100% device responsiveness.
 
 ---
 
@@ -21,12 +21,12 @@ Access the live platform online:
 - 🕸 **Interactive 2D Canvas Topology Map**: Animated glowing network topology nodes with live moving packet pulses.
 - 🛡 **AI Sentinel Cyber Security Stream**: Real-time security incident feed with 1-click threat mitigation actions.
 - 💻 **Real-Time Interactive CLI Terminal**: Embedded terminal window (`Aether CLI`) supporting commands like `status`, `nodes`, `threats`, `simulate`, `mitigate`, `scan`, and `ping`.
-- ⚡ **Interactive Cyber Attack Simulator**: 1-click synthetic attack injection for live recruiter and evaluation demos.
+- ⚡ **Interactive Cyber Attack Simulator**: 1-click synthetic attack injection for live technical demos.
 - 🎨 **Multi-Theme Palette Engine**: Switch seamlessly between **Cyber Blue**, **Cyberpunk Pink**, and **Emerald Matrix** modes.
 - 📱 **100% Mobile & Device Responsive**: Slide-over mobile drawer navigation, fluid CSS grids, and responsive chart scaling.
 
 ---
 
-## 📑 Project & Academic Specifications
+## 📑 Technical Specifications
 
-For complete architecture diagrams, REST API specifications, and IEEE B.Tech Capstone details, view the [Project Report](PROJECT_REPORT.md).
+For system architecture diagrams, REST API specifications, and performance analysis, view the [Project Report](PROJECT_REPORT.md).

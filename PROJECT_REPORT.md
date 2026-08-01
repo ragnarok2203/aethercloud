@@ -1,16 +1,14 @@
-# 🎓 AETHERCLOUD PULSEMATRIX
+# ⚡ AETHERCLOUD PULSEMATRIX
 ## Autonomous Real-Time Multi-Cloud Observability & Cyber Threat Neutralization Platform
-### A B.Tech Capstone / Final Year Project Report & Technical Specification
+### System Architecture & Technical Specifications
 
-**Author**: Engineering Capstone Team  
-**Institution**: Department of Computer Science & Cloud Engineering  
 **Version**: `v2.0.0-Release` | **Status**: `DEPLOYED & PRODUCTION-READY`  
 **Live Deployment URL**: [https://aethercloud-t07d.onrender.com](https://aethercloud-t07d.onrender.com)  
 **GitHub Repository**: [https://github.com/ragnarok2203/aethercloud](https://github.com/ragnarok2203/aethercloud)  
 
 ---
 
-## 📄 Abstract
+## 📄 Platform Summary
 
 Modern enterprise IT systems are increasingly deployed across heterogeneous multi-cloud environments (AWS, Microsoft Azure, Google Cloud Platform). Monitoring sub-second telemetry metrics (network bandwidth throughput, ping latency, container load, and active security threats) across distributed nodes presents significant architectural challenges regarding data latency, UI responsiveness, and threat mitigation speed.
 
@@ -18,7 +16,7 @@ Modern enterprise IT systems are increasingly deployed across heterogeneous mult
 1. **Sub-second Real-Time Streaming Engine**: Implemented via Node.js/Express, polling telemetry samples every 1.0s–4.0s with low-overhead JSON streaming.
 2. **Interactive 2D Topology Canvas Mesh**: Built using HTML5 Canvas 2D context to render multi-region cloud nodes connected by dynamic mesh links with continuous animated glowing data packet particles.
 3. **AI Sentinel Cyber Security Threat Mitigation**: Autonomous threat detection and 1-click single/all incident firewall rule synthesis (DDoS SYN Floods, SQL Injection Probes, Credential Stuffing).
-4. **Interactive Hacker-Style CLI Terminal**: Embedded shell console (`Aether CLI`) executing interactive status audits, vulnerability scans, ping tests, and live attack simulations.
+4. **Interactive Cyber CLI Terminal**: Embedded shell console (`Aether CLI`) executing interactive status audits, vulnerability scans, ping tests, and live attack simulations.
 5. **Multi-Theme Glassmorphism UI & Mobile Responsiveness**: Cyber Blue, Cyberpunk Pink, and Emerald Matrix design system with sliding drawer navigation for smartphones and desktop screens.
 
 ---
@@ -78,7 +76,7 @@ flowchart TD
 - **REST Endpoints**:
   - `GET /api/realtime/stream`: Delivers live telemetry JSON payload.
   - `POST /api/action/mitigate`: Neutralizes active threats.
-  - `POST /api/action/simulate-attack`: Injects live cyber attack vectors for interviewer/evaluator demos.
+  - `POST /api/action/simulate-attack`: Injects live cyber attack vectors for technical demos.
   - `POST /api/action/command`: Handles interactive CLI shell commands.
 
 ### 2.2 Frontend Glassmorphism UI Stack ([index.html](file:///d:/training%20project%201/src/frontend/index.html), [styles.css](file:///d:/training%20project%201/src/frontend/styles.css), [app.js](file:///d:/training%20project%201/src/frontend/app.js))
@@ -99,7 +97,7 @@ flowchart TD
 
 ---
 
-## 🧪 4. Performance & Experimental Results
+## 🧪 4. Performance & Benchmark Results
 
 | Metric | Target Goal | Observed Measured Performance |
 | :--- | :--- | :--- |
@@ -128,9 +126,9 @@ CMD ["npm", "start"]
 
 ---
 
-## 🏁 6. Conclusion & Future Scope
+## 🏁 6. Conclusion & System Architecture Highlights
 
-**AetherCloud PulseMatrix** successfully demonstrates that sub-second cloud observability and interactive 2D topology visual mesh rendering can be built cleanly using lightweight Node.js architecture.
+**AetherCloud PulseMatrix** demonstrates that sub-second cloud observability and interactive 2D topology visual mesh rendering can be built cleanly using lightweight Node.js architecture.
 
 ### Future Extensions:
 1. Integration with real **Prometheus / AWS CloudWatch SDKs**.
