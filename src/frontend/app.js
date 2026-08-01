@@ -35,6 +35,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const pane = document.getElementById(`tab-${target}`);
       if (pane) pane.classList.add('active');
 
+      if (target === 'topology' && typeof resizeTopologyCanvas === 'function') {
+        setTimeout(resizeTopologyCanvas, 50);
+      }
+
       if (sidebar.classList.contains('active')) toggleSidebar();
     });
   });
@@ -140,31 +144,36 @@ function initBgCanvas() {
    -------------------------------------------------------------------- */
 let topologyPackets = [];
 
+let resizeTopologyCanvas = null;
+
 function initTopologyCanvas() {
   const canvas = document.getElementById('topology-canvas');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
   const container = canvas.parentElement;
 
-  function resize() {
-    canvas.width = container.clientWidth;
-    canvas.height = container.clientHeight;
-  }
-  resize();
-  window.addEventListener('resize', resize);
+  resizeTopologyCanvas = function() {
+    if (container && container.clientWidth > 0) {
+      canvas.width = container.clientWidth;
+      canvas.height = container.clientHeight || 320;
+    }
+  };
+
+  resizeTopologyCanvas();
+  window.addEventListener('resize', resizeTopologyCanvas);
 
   const nodes = [
-    { name: 'AWS US-East', x: 0.2, y: 0.3, color: '#ff9900' },
-    { name: 'Azure East-US', x: 0.4, y: 0.2, color: '#0078d4' },
-    { name: 'GCP US-Central', x: 0.3, y: 0.7, color: '#ea4335' },
-    { name: 'AWS EU-Central', x: 0.7, y: 0.25, color: '#ff9900' },
-    { name: 'Azure West-EU', x: 0.8, y: 0.6, color: '#0078d4' },
-    { name: 'GCP Asia-East', x: 0.6, y: 0.75, color: '#ea4335' }
+    { name: 'AWS US-East', x: 0.15, y: 0.35, color: '#ff9900' },
+    { name: 'Azure East-US', x: 0.38, y: 0.22, color: '#0078d4' },
+    { name: 'GCP US-Central', x: 0.28, y: 0.72, color: '#ea4335' },
+    { name: 'AWS EU-Central', x: 0.65, y: 0.25, color: '#ff9900' },
+    { name: 'Azure West-EU', x: 0.85, y: 0.6, color: '#0078d4' },
+    { name: 'GCP Asia-East', x: 0.6, y: 0.78, color: '#ea4335' }
   ];
 
   // Connections
   const links = [
-    [0, 1], [0, 2], [1, 3], [2, 5], [3, 4], [4, 5], [1, 4]
+    [0, 1], [0, 2], [1, 3], [2, 5], [3, 4], [4, 5], [1, 4], [2, 3]
   ];
 
   // Generate continuous moving packets
@@ -174,71 +183,83 @@ function initTopologyCanvas() {
       from: nodes[link[0]],
       to: nodes[link[1]],
       progress: 0,
-      speed: 0.008 + Math.random() * 0.012,
+      speed: 0.006 + Math.random() * 0.01,
       color: nodes[link[0]].color
     });
   }
 
-  setInterval(addPacket, 400);
+  setInterval(addPacket, 300);
 
   function render() {
+    // Auto-fix 0-width canvas when tab becomes visible
+    if (canvas.width === 0 && container && container.clientWidth > 0) {
+      resizeTopologyCanvas();
+    }
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Draw Links
+    const w = canvas.width || 800;
+    const h = canvas.height || 320;
+
+    // Draw Grid Lines
     ctx.lineWidth = 1.5;
     links.forEach(([i, j]) => {
       const n1 = nodes[i];
       const n2 = nodes[j];
-      ctx.strokeStyle = 'rgba(99, 102, 241, 0.25)';
+      ctx.strokeStyle = 'rgba(99, 102, 241, 0.3)';
       ctx.beginPath();
-      ctx.moveTo(n1.x * canvas.width, n1.y * canvas.height);
-      ctx.lineTo(n2.x * canvas.width, n2.y * canvas.height);
+      ctx.moveTo(n1.x * w, n1.y * h);
+      ctx.lineTo(n2.x * w, n2.y * h);
       ctx.stroke();
     });
 
-    // Draw Moving Packets
+    // Draw Moving Data Packets
     topologyPackets.forEach((p, index) => {
       p.progress += p.speed;
       if (p.progress >= 1) {
         topologyPackets.splice(index, 1);
         return;
       }
-      const currentX = p.from.x * canvas.width + (p.to.x * canvas.width - p.from.x * canvas.width) * p.progress;
-      const currentY = p.from.y * canvas.height + (p.to.y * canvas.height - p.from.y * canvas.height) * p.progress;
+      const currentX = p.from.x * w + (p.to.x * w - p.from.x * w) * p.progress;
+      const currentY = p.from.y * h + (p.to.y * h - p.from.y * h) * p.progress;
 
       ctx.fillStyle = p.color;
       ctx.shadowColor = p.color;
-      ctx.shadowBlur = 10;
+      ctx.shadowBlur = 12;
       ctx.beginPath();
-      ctx.arc(currentX, currentY, 4, 0, Math.PI * 2);
+      ctx.arc(currentX, currentY, 5, 0, Math.PI * 2);
       ctx.fill();
       ctx.shadowBlur = 0;
     });
 
     // Draw Nodes
     nodes.forEach(n => {
-      const nx = n.x * canvas.width;
-      const ny = n.y * canvas.height;
+      const nx = n.x * w;
+      const ny = n.y * h;
 
       // Outer glow pulse
       ctx.fillStyle = n.color;
       ctx.shadowColor = n.color;
-      ctx.shadowBlur = 15;
+      ctx.shadowBlur = 18;
       ctx.beginPath();
-      ctx.arc(nx, ny, 8, 0, Math.PI * 2);
+      ctx.arc(nx, ny, 9, 0, Math.PI * 2);
       ctx.fill();
       ctx.shadowBlur = 0;
 
-      // Inner dot
+      // Inner white dot
       ctx.fillStyle = '#ffffff';
       ctx.beginPath();
-      ctx.arc(nx, ny, 3, 0, Math.PI * 2);
+      ctx.arc(nx, ny, 3.5, 0, Math.PI * 2);
       ctx.fill();
 
-      // Text label
+      // Label background & text
       ctx.font = '700 11px Plus Jakarta Sans';
-      ctx.fillStyle = '#f8fafc';
-      ctx.fillText(n.name, nx + 12, ny + 4);
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.75)';
+      const textWidth = ctx.measureText(n.name).width;
+      ctx.fillRect(nx + 10, ny - 10, textWidth + 8, 16);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.fillText(n.name, nx + 14, ny + 2);
     });
 
     requestAnimationFrame(render);
