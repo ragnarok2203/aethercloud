@@ -1,0 +1,60 @@
+# 1. Kubernetes Service Manifest
+apiVersion: v1
+kind: Service
+metadata:
+  name: cloudops-backend-service
+  namespace: cloudops-system
+  labels:
+    app: cloudops-backend
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 5000
+    protocol: TCP
+    name: http
+  selector:
+    app: cloudops-backend
+---
+# 2. Kubernetes Ingress Routing Manifest
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: cloudops-ingress
+  namespace: cloudops-system
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  rules:
+  - host: cloudops.cybercore.internal
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: cloudops-backend-service
+            port:
+              number: 80
+---
+# 3. Horizontal Pod Autoscaler (HPA) Manifest
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: cloudops-backend-hpa
+  namespace: cloudops-system
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: cloudops-backend-deployment
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 75

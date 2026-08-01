@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AetherCloud - Real-Time Autonomous Cloud & Cyber Telemetry Platform</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Ambient Particle Mesh Background -->
+  <canvas id="bg-canvas"></canvas>
+
+  <!-- Notification Toast Shelf -->
+  <div id="toast-shelf"></div>
+
+  <!-- Header Bar Controls -->
+  <header>
+    <div class="brand-section">
+      <button class="hamburger-toggle" id="btn-toggle-sidebar" aria-label="Toggle Sidebar Menu">☰</button>
+      <div class="brand-logo">⚡</div>
+      <div class="brand-title">
+        <h1>AetherCloud PulseMatrix</h1>
+        <p>AUTONOMOUS REAL-TIME OBSERVABILITY MESH</p>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <!-- Real-Time Status Ticker -->
+      <div class="realtime-ticker">
+        <span class="beacon-dot"></span>
+        <span id="ticker-status-text">LIVE STREAMING (1.5s)</span>
+      </div>
+
+      <!-- Play / Pause Stream Button -->
+      <button class="ctrl-btn" id="btn-stream-toggle">
+        <span id="stream-icon">⏸</span> <span id="stream-text">Pause Stream</span>
+      </button>
+
+      <!-- Polling Interval Selector -->
+      <select class="ctrl-select" id="sel-stream-interval">
+        <option value="1000">Stream: 1.0s</option>
+        <option value="2000" selected>Stream: 2.0s</option>
+        <option value="4000">Stream: 4.0s</option>
+      </select>
+
+      <!-- Cyber Theme Selector -->
+      <select class="ctrl-select" id="sel-cyber-theme">
+        <option value="theme-cyber">Theme: Cyber Blue</option>
+        <option value="theme-cyberpunk">Theme: Cyberpunk Pink</option>
+        <option value="theme-emerald">Theme: Emerald Matrix</option>
+      </select>
+    </div>
+  </header>
+
+  <!-- Application Viewport Layout -->
+  <div class="app-viewport">
+    <!-- Backdrop for mobile drawer -->
+    <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+    <!-- Sidebar Navigation -->
+    <aside class="app-sidebar" id="app-sidebar">
+      <div class="nav-link active" data-tab="overview">
+        <span class="nav-icon">📊</span> Overview & Telemetry
+      </div>
+      <div class="nav-link" data-tab="topology">
+        <span class="nav-icon">🕸</span> Interactive Topology
+      </div>
+      <div class="nav-link" data-tab="security">
+        <span class="nav-icon">🛡</span> Cyber Security Matrix
+      </div>
+      <div class="nav-link" data-tab="terminal">
+        <span class="nav-icon">💻</span> Real-Time CLI Terminal
+      </div>
+      <div class="nav-link" data-tab="nodes">
+        <span class="nav-icon">☸</span> Cloud Cluster Nodes
+      </div>
+    </aside>
+
+    <!-- Main Workspace Area -->
+    <main class="main-workspace">
+      <!-- Live Metrics Header Cards -->
+      <div class="telemetry-grid">
+        <div class="telemetry-card">
+          <div class="card-label">Network Throughput</div>
+          <div class="card-number" id="val-throughput">--</div>
+          <div class="card-foot">⚡ Global Mesh Bandwidth</div>
+        </div>
+        <div class="telemetry-card">
+          <div class="card-label">Average Latency</div>
+          <div class="card-number" id="val-latency">--</div>
+          <div class="card-foot">⏱ Sub-Second Ping</div>
+        </div>
+        <div class="telemetry-card">
+          <div class="card-label">Active Cyber Threats</div>
+          <div class="card-number" id="val-threats">--</div>
+          <div class="card-foot" style="color: var(--danger-color);" id="val-threat-foot">AI Shield Guarding</div>
+        </div>
+        <div class="telemetry-card">
+          <div class="card-label">Global CPU & RAM Load</div>
+          <div class="card-number" id="val-cpu-ram">--</div>
+          <div class="card-foot">☸ 6 Multi-Cloud Nodes</div>
+        </div>
+      </div>
+
+      <!-- TAB 1: OVERVIEW & REAL-TIME STREAM -->
+      <section id="tab-overview" class="tab-pane active">
+        <div class="pane-title-bar">
+          <div class="pane-title">Real-Time Observability & Live Telemetry</div>
+          <button class="action-btn" id="btn-mitigate-all">🛡 Mitigate All Cyber Threats</button>
+        </div>
+
+        <div class="grid-two-col">
+          <!-- Real-Time Line Graph: Throughput & Latency -->
+          <div class="glass-box" style="grid-column: span 2;">
+            <div class="box-title">
+              <span>⚡ Real-Time Multi-Region Network Throughput & Ping Latency</span>
+              <span class="badge-cyber badge-healthy" id="badge-stream-rate">Streaming Data</span>
+            </div>
+            <div class="chart-box">
+              <canvas id="chart-realtime-throughput"></canvas>
+            </div>
+          </div>
+
+          <!-- Chart 2: Threat Vector Radar -->
+          <div class="glass-box">
+            <div class="box-title">🛡 Active Cyber Threat Distribution</div>
+            <div class="chart-box" style="max-height: 240px; display: flex; justify-content: center;">
+              <canvas id="chart-threat-vectors"></canvas>
+            </div>
+          </div>
+
+          <!-- Chart 3: Node CPU Load Bar Chart -->
+          <div class="glass-box">
+            <div class="box-title">☸ Cloud Node Utilization Load (%)</div>
+            <div class="chart-box">
+              <canvas id="chart-node-loads"></canvas>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: INTERACTIVE TOPOLOGY MAP -->
+      <section id="tab-topology" class="tab-pane">
+        <div class="pane-title-bar">
+          <div class="pane-title">Interactive Multi-Cloud Network Topology Canvas</div>
+          <button class="action-btn" id="btn-pulse-topology">⚡ Dispatch Pulse Packets</button>
+        </div>
+        <div class="glass-box">
+          <div class="box-title">🌐 Live Node Connections & Moving Data Packets</div>
+          <div class="topology-container">
+            <canvas id="topology-canvas"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: CYBER SECURITY MATRIX -->
+      <section id="tab-security" class="tab-pane">
+        <div class="pane-title-bar">
+          <div class="pane-title">AI Sentinel Cyber Security Threat Stream</div>
+        </div>
+        <div class="glass-box">
+          <div class="box-title">🚨 Real-Time Security Incident Stream & Neutralizer</div>
+          <div class="incident-stream" id="incident-stream-list">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 4: REAL-TIME CLI TERMINAL -->
+      <section id="tab-terminal" class="tab-pane">
+        <div class="pane-title-bar">
+          <div class="pane-title">Aether Real-Time Interactive CLI Terminal</div>
+        </div>
+        <div class="terminal-window">
+          <div class="terminal-header">
+            <span class="t-dot t-red"></span>
+            <span class="t-dot t-yellow"></span>
+            <span class="t-dot t-green"></span>
+            <span class="terminal-title">Aether Autonomous Cyber Terminal v2.0 (Type 'help')</span>
+          </div>
+          <div class="terminal-output" id="terminal-output">Welcome to AetherCloud Real-Time Terminal.
+Type 'help' to view available system commands.
+</div>
+          <form class="terminal-prompt-line" id="terminal-form">
+            <span class="t-prompt">aether@pulsematrix:~$</span>
+            <input type="text" class="t-input" id="terminal-input" placeholder="Type command here (e.g., status, threats, mitigate, scan)..." autocomplete="off">
+          </form>
+        </div>
+      </section>
+
+      <!-- TAB 5: CLOUD CLUSTER NODES -->
+      <section id="tab-nodes" class="tab-pane">
+        <div class="pane-title-bar">
+          <div class="pane-title">Multi-Cloud Node Mesh Inventory</div>
+        </div>
+        <div class="glass-box">
+          <div class="box-title">☸ Active Nodes State & Live Rebalancing</div>
+          <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem;">
+              <thead>
+                <tr style="border-bottom: 1px solid var(--border-color); color: var(--text-muted);">
+                  <th style="padding: 0.75rem;">Node ID</th>
+                  <th style="padding: 0.75rem;">Name</th>
+                  <th style="padding: 0.75rem;">Region</th>
+                  <th style="padding: 0.75rem;">Status</th>
+                  <th style="padding: 0.75rem;">Load</th>
+                  <th style="padding: 0.75rem;">Latency</th>
+                  <th style="padding: 0.75rem;">Action</th>
+                </tr>
+              </thead>
+              <tbody id="tbl-nodes-body">
+                <!-- Rendered by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  # 1. CloudOps Core Backend API & Web Dashboard
+  cloudops-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cloudops-platform-app
+    ports:
+      - "5000:5000"
+    environment:
+      - PORT=5000
+      - NODE_ENV=production
+      - DB_HOST=postgres-db
+      - DB_USER=cloudops_user
+      - DB_PASS=cloudops_secret_password
+    depends_on:
+      - postgres-db
+    networks:
+      - cloudops-net
+    restart: always
+
+  # 2. Database Service
+  postgres-db:
+    image: postgres:15-alpine
+    container_name: cloudops-postgres-db
+    environment:
+      POSTGRES_DB: cloudops_db
+      POSTGRES_USER: cloudops_user
+      POSTGRES_PASSWORD: cloudops_secret_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - cloudops-net
+    restart: always
+
+  # 3. Prometheus Monitoring Metric Collector
+  prometheus:
+    image: prom/prometheus:v2.45.0
+    container_name: cloudops-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - cloudops-net
+    restart: always
+
+networks:
+  cloudops-net:
+    driver: bridge
+
+volumes:
+  postgres_data:

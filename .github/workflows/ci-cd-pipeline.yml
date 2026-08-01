@@ -1,0 +1,43 @@
+name: CloudOps Multi-Cloud Automated CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build-and-validate:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Source Code
+      uses: actions/checkout@v3
+
+    - name: Setup Node.js Environment
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'
+
+    - name: Install Project Dependencies
+      run: npm ci
+
+    - name: Validate Terraform Files
+      uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: 1.8.5
+
+    - name: Run Terraform Init & Validate
+      run: |
+        cd terraform
+        terraform init -backend=false
+        terraform validate
+
+    - name: Build Docker Container Image
+      run: |
+        docker build -t cloudops/platform-app:${{ github.sha }} .
+
+    - name: Verify Kubernetes Manifests Syntax
+      run: |
+        cd kubernetes
+        kubectl apply --dry-run=client -f .

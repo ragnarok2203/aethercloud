@@ -1,0 +1,36 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 1,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "id": 1,
+      "title": "AWS EC2 CPU Utilization",
+      "type": "timeseries",
+      "targets": [{ "expr": "node_cpu_utilization{provider='AWS'}" }]
+    },
+    {
+      "id": 2,
+      "title": "Kubernetes Active Pods",
+      "type": "stat",
+      "targets": [{ "expr": "kube_pod_status_phase{phase='Running'}" }]
+    },
+    {
+      "id": 3,
+      "title": "Monthly Cloud Spend ($)",
+      "type": "gauge",
+      "targets": [{ "expr": "cloudops_cost_monthly_dollars" }]
+    }
+  ],
+  "refresh": "5s",
+  "schemaVersion": 38,
+  "style": "dark",
+  "tags": ["cloudops", "aws", "azure", "gcp", "kubernetes"],
+  "time": { "from": "now-6h", "to": "now" },
+  "title": "CloudOps Multi-Cloud Overview Dashboard",
+  "version": 1
+}
