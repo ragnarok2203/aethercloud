@@ -63,6 +63,35 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('sel-stream-interval').addEventListener('change', changeStreamInterval);
   document.getElementById('btn-mitigate-all').addEventListener('click', mitigateAllThreats);
   document.getElementById('btn-pulse-topology').addEventListener('click', triggerTopologyPulse);
+
+  // Interactive Cyber Threat Card Click Handler
+  const threatCard = document.getElementById('card-active-threats');
+  if (threatCard) {
+    threatCard.addEventListener('click', () => {
+      // 1. Switch to Security Tab
+      navLinks.forEach(l => l.classList.remove('active'));
+      tabPanes.forEach(p => p.classList.remove('active'));
+
+      const secLink = document.querySelector('.nav-link[data-tab="security"]');
+      const secPane = document.getElementById('tab-security');
+      if (secLink) secLink.classList.add('active');
+      if (secPane) secPane.classList.add('active');
+
+      // 2. Open Threat Inspector Modal
+      openThreatInspectorModal();
+    });
+  }
+
+  // Threat Modal Controls
+  const btnCloseThreatModal = document.getElementById('btn-close-threat-modal');
+  const btnModalMitigateAll = document.getElementById('btn-modal-mitigate-all');
+  const modalThreatInspector = document.getElementById('modal-threat-inspector');
+
+  if (btnCloseThreatModal) btnCloseThreatModal.addEventListener('click', () => modalThreatInspector.classList.remove('active'));
+  if (btnModalMitigateAll) btnModalMitigateAll.addEventListener('click', () => {
+    mitigateAllThreats();
+    modalThreatInspector.classList.remove('active');
+  });
 });
 
 // Toast Shelf Helper
@@ -484,7 +513,44 @@ async function fetchRealTimeData() {
   }
 }
 
+let currentThreatsState = [];
+
+function openThreatInspectorModal() {
+  const modal = document.getElementById('modal-threat-inspector');
+  const body = document.getElementById('modal-threat-body');
+  if (!modal || !body) return;
+
+  const activeThreats = (currentThreatsState || []).filter(t => t.status === 'ACTIVE');
+
+  if (activeThreats.length === 0) {
+    body.innerHTML = `
+      <div style="text-align: center; padding: 1.5rem 1rem;">
+        <div style="font-size: 3rem; margin-bottom: 0.75rem;">🛡</div>
+        <div style="color: var(--success-color); font-weight: 800; font-size: 1.25rem;">All Cyber Threats Neutralized!</div>
+        <div style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.4rem;">AI Sentinel Shield is actively guarding all 6 cloud nodes. 0 active intrusions detected.</div>
+      </div>
+    `;
+  } else {
+    body.innerHTML = activeThreats.map(t => `
+      <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-color); border-radius: 12px; padding: 1rem; margin-bottom: 0.75rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+          <span class="badge-cyber badge-${t.severity.toLowerCase()}">${t.severity} SEVERITY</span>
+          <span style="font-size: 0.75rem; color: var(--text-muted);">${t.timestamp}</span>
+        </div>
+        <div style="font-size: 1rem; font-weight: 800; color: #fff; margin-bottom: 0.3rem;">${t.type}</div>
+        <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.85rem;">
+          Attacker IP: <code style="color: var(--accent-cyan); font-weight: 700;">${t.sourceIP}</code> &rarr; Target Node: <code style="color: #fff; font-weight: 700;">${t.target}</code>
+        </div>
+        <button class="action-btn" style="width: 100%; justify-content: center;" onclick="mitigateSingleThreat('${t.id}'); document.getElementById('modal-threat-inspector').classList.remove('active');">🛡 Neutralize Threat Now</button>
+      </div>
+    `).join('');
+  }
+
+  modal.classList.add('active');
+}
+
 function renderThreatStream(threats) {
+  currentThreatsState = threats || [];
   const container = document.getElementById('incident-stream-list');
   if (!container) return;
 

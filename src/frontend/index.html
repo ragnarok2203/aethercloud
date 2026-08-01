@@ -97,10 +97,10 @@
           <div class="card-number" id="val-latency">--</div>
           <div class="card-foot">⏱ Sub-Second Ping</div>
         </div>
-        <div class="telemetry-card">
-          <div class="card-label">Active Cyber Threats</div>
+        <div class="telemetry-card clickable-card" id="card-active-threats" title="Click to inspect active threats">
+          <div class="card-label">Active Cyber Threats 🔍</div>
           <div class="card-number" id="val-threats">--</div>
-          <div class="card-foot" style="color: var(--danger-color);" id="val-threat-foot">AI Shield Guarding</div>
+          <div class="card-foot" style="color: var(--danger-color);" id="val-threat-foot">Click to View & Mitigate &rarr;</div>
         </div>
         <div class="telemetry-card">
           <div class="card-label">Global CPU & RAM Load</div>
@@ -223,6 +223,20 @@ Type 'help' to view available system commands.
         </div>
       </section>
     </main>
+  </div>
+
+  <!-- Glass Modal: Active Threat Inspector -->
+  <div class="modal-wrapper" id="modal-threat-inspector">
+    <div class="glass-modal" style="max-width: 520px;">
+      <div class="modal-title" style="color: var(--danger-color);">🚨 Active Cyber Threat Inspector</div>
+      <div class="modal-body" id="modal-threat-body">
+        <p style="color: var(--text-muted);">Loading threat details...</p>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="ctrl-btn" id="btn-close-threat-modal">Close Inspector</button>
+        <button type="button" class="action-btn" id="btn-modal-mitigate-all">🛡 Mitigate All Threats</button>
+      </div>
+    </div>
   </div>
 
   <script src="app.js"></script>
