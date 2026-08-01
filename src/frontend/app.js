@@ -431,14 +431,14 @@ async function fetchRealTimeData() {
       chartRealtimeThroughput.data.labels = data.history.map(h => h.time);
       chartRealtimeThroughput.data.datasets[0].data = data.history.map(h => h.throughputGbps);
       chartRealtimeThroughput.data.datasets[1].data = data.history.map(h => h.avgLatencyMs);
-      chartRealtimeThroughput.update('quiet');
+      chartRealtimeThroughput.update('none');
     }
 
     // Update Node Loads Bar Chart
     if (chartNodeLoads && data.nodes) {
       chartNodeLoads.data.labels = data.nodes.map(n => n.name);
       chartNodeLoads.data.datasets[0].data = data.nodes.map(n => n.load);
-      chartNodeLoads.update('quiet');
+      chartNodeLoads.update('none');
     }
 
     // Update Security Stream
