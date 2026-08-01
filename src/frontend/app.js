@@ -63,6 +63,8 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('sel-stream-interval').addEventListener('change', changeStreamInterval);
   document.getElementById('btn-mitigate-all').addEventListener('click', mitigateAllThreats);
   document.getElementById('btn-pulse-topology').addEventListener('click', triggerTopologyPulse);
+  const btnSimulate = document.getElementById('btn-simulate-attack');
+  if (btnSimulate) btnSimulate.addEventListener('click', simulateAttack);
 
   // Interactive Cyber Threat Card Click Handler
   const threatCard = document.getElementById('card-active-threats');
@@ -457,6 +459,20 @@ function toggleStream() {
     ticker.parentElement.style.color = 'var(--success-color)';
     startRealTimeStream();
     showToast('Real-time telemetry stream resumed.', 'Stream Live');
+  }
+}
+
+async function simulateAttack() {
+  try {
+    const res = await fetch('/api/action/simulate-attack', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+    });
+    const data = await res.json();
+    showToast(data.message || '🚨 Cyber attack injected live!', 'Attack Simulated');
+    fetchRealTimeData();
+  } catch (err) {
+    showToast('Failed to simulate attack endpoint.', 'Simulation Error');
   }
 }
 

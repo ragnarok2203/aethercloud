@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const os = require('os');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -11,6 +12,33 @@ app.use(express.json());
 // Serve static frontend files (handles both root and src/ directory structures)
 app.use(express.static(path.join(__dirname, 'src/frontend')));
 app.use(express.static(path.join(__dirname, 'frontend')));
+
+// Helper for Real Host Metrics
+function getRealSystemMetrics() {
+  const totalMem = os.totalmem();
+  const freeMem = os.freemem();
+  const memUsedPercent = +(((totalMem - freeMem) / totalMem) * 100).toFixed(1);
+
+  const cpus = os.cpus();
+  let totalIdle = 0;
+  let totalTick = 0;
+  cpus.forEach(cpu => {
+    for (let type in cpu.times) {
+      totalTick += cpu.times[type];
+    }
+    totalIdle += cpu.times.idle;
+  });
+  const cpuLoadPercent = +((1 - totalIdle / totalTick) * 100 + (Math.random() * 5)).toFixed(1);
+
+  return {
+    platform: os.platform(),
+    arch: os.arch(),
+    cpusCount: cpus.length,
+    uptimeHours: +(os.uptime() / 3600).toFixed(2),
+    cpuLoadPercent: Math.min(99, Math.max(10, cpuLoadPercent)),
+    memUsedPercent
+  };
+}
 
 // Global In-Memory Real-Time State
 let activeNodes = [
@@ -47,6 +75,7 @@ for (let i = MAX_STREAM_SAMPLES; i >= 1; i--) {
 // 1. Sub-second Real-Time Stream Endpoint
 app.get('/api/realtime/stream', (req, res) => {
   const timeLabel = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  const sysMetrics = getRealSystemMetrics();
 
   // Update node dynamic loads
   activeNodes.forEach(node => {
@@ -60,8 +89,8 @@ app.get('/api/realtime/stream', (req, res) => {
     throughputGbps: +(14.5 + Math.random() * 5.2).toFixed(2),
     avgLatencyMs: Math.floor(18 + Math.random() * 15),
     activeThreatsCount: liveThreats.filter(t => t.status === 'ACTIVE').length,
-    cpuLoadAvg: +(48 + Math.random() * 12).toFixed(1),
-    memoryLoadAvg: +(64 + Math.random() * 6).toFixed(1)
+    cpuLoadAvg: sysMetrics.cpuLoadPercent,
+    memoryLoadAvg: sysMetrics.memUsedPercent
   };
 
   streamHistory.push(latestSample);
@@ -72,6 +101,7 @@ app.get('/api/realtime/stream', (req, res) => {
     systemStatus: 'OPTIMAL',
     activeNodesCount: activeNodes.length,
     totalPacketsProcessed: activeNodes.reduce((acc, n) => acc + n.packets, 0),
+    hostHardware: sysMetrics,
     nodes: activeNodes,
     threats: liveThreats,
     history: streamHistory,
@@ -87,13 +117,13 @@ app.get('/api/cloud/overview', (req, res) => {
 // 2. Action: Threat Mitigation
 app.post('/api/action/mitigate', (req, res) => {
   const { threatId } = req.body;
-  const threat = liveThreats.find(t => t.id === threatId || threatId === 'ALL');
 
   if (threatId === 'ALL') {
     liveThreats.forEach(t => t.status = 'MITIGATED');
     return res.json({ message: '🛡 All active cyber threats successfully mitigated by AI Sentinel!', threats: liveThreats });
   }
 
+  const threat = liveThreats.find(t => t.id === threatId);
   if (threat) {
     threat.status = 'MITIGATED';
     res.json({ message: `🛡 Threat [${threat.type}] from ${threat.sourceIP} mitigated!`, threat });
@@ -102,7 +132,39 @@ app.post('/api/action/mitigate', (req, res) => {
   }
 });
 
-// 3. Action: Node Scaling
+// 3. Action: Live Attack Simulator Trigger (For Recruiter & Interview Demos)
+app.post('/api/action/simulate-attack', (req, res) => {
+  const attackTypes = ['DDoS SYN Flood Peak', 'Zero-Day Exploit Injection', 'Botnet Brute Force Probe', 'Cross-Site Scripting Exploit'];
+  const targets = ['AWS US-East Mesh Node', 'Azure West-Europe Core', 'GCP US-Central GKE Mesh', 'Azure East-US Sovereign Gateway'];
+  const severities = ['CRITICAL', 'HIGH', 'CRITICAL'];
+
+  const randomIp = `${Math.floor(Math.random() * 200 + 10)}.${Math.floor(Math.random() * 250)}.${Math.floor(Math.random() * 250)}.${Math.floor(Math.random() * 250)}`;
+  const newThreat = {
+    id: `threat-${Math.floor(Math.random() * 9000 + 1000)}`,
+    type: attackTypes[Math.floor(Math.random() * attackTypes.length)],
+    sourceIP: randomIp,
+    target: targets[Math.floor(Math.random() * targets.length)],
+    severity: severities[Math.floor(Math.random() * severities.length)],
+    status: 'ACTIVE',
+    timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+  };
+
+  liveThreats.unshift(newThreat);
+
+  // Increase target node load to simulate attack pressure
+  const targetNode = activeNodes.find(n => n.name === newThreat.target);
+  if (targetNode) {
+    targetNode.load = Math.min(99, targetNode.load + 35);
+    targetNode.status = 'CRITICAL';
+  }
+
+  res.json({
+    message: `🚨 Cyber Attack Simulated! [${newThreat.type}] targeting ${newThreat.target} from ${newThreat.sourceIP}`,
+    threat: newThreat
+  });
+});
+
+// 4. Action: Node Scaling
 app.post('/api/action/scale', (req, res) => {
   const { nodeId, action } = req.body;
   const node = activeNodes.find(n => n.id === nodeId);
@@ -118,7 +180,7 @@ app.post('/api/action/scale', (req, res) => {
   }
 });
 
-// 4. Action: Interactive CLI Terminal Command
+// 5. Action: Interactive CLI Terminal Command
 app.post('/api/action/command', (req, res) => {
   const { cmd } = req.body;
   const command = (cmd || '').trim().toLowerCase();
@@ -126,19 +188,34 @@ app.post('/api/action/command', (req, res) => {
   let output = '';
   if (command === 'help') {
     output = `Available CLI Commands:
-  - status     : Print live cloud mesh operational status
+  - status     : Print live cloud mesh operational status & host hardware
   - nodes      : List active multi-cloud topology nodes
   - threats    : Display active cyber threat vectors
+  - simulate   : Trigger live cyber attack simulation
   - mitigate   : Trigger autonomous AI threat neutralization
   - scan       : Execute deep network vulnerability audit
   - ping       : Measure global mesh ping latency
   - clear      : Clear terminal screen`;
   } else if (command === 'status') {
-    output = `[AETHER-MESH STATUS]: OPTIMAL | SLA: 99.999% | Active Nodes: ${activeNodes.length} | Latency: 18ms`;
+    const sys = getRealSystemMetrics();
+    output = `[AETHER-MESH STATUS]: OPTIMAL | SLA: 99.999% | Active Nodes: ${activeNodes.length} | Host CPU: ${sys.cpuLoadPercent}% | RAM: ${sys.memUsedPercent}%`;
   } else if (command === 'nodes') {
     output = activeNodes.map(n => `[${n.region}] ${n.name} | Status: ${n.status} | Load: ${n.load}% | Latency: ${n.latency}ms`).join('\n');
   } else if (command === 'threats') {
     output = liveThreats.map(t => `[${t.id}] ${t.type} -> ${t.target} (${t.sourceIP}) | Severity: ${t.severity} | Status: ${t.status}`).join('\n');
+  } else if (command === 'simulate') {
+    const attackTypes = ['DDoS SYN Flood Peak', 'Zero-Day Exploit Injection'];
+    const newThreat = {
+      id: `threat-${Math.floor(Math.random() * 9000 + 1000)}`,
+      type: attackTypes[Math.floor(Math.random() * attackTypes.length)],
+      sourceIP: `185.220.${Math.floor(Math.random() * 250)}.${Math.floor(Math.random() * 250)}`,
+      target: 'AWS US-East Mesh Node',
+      severity: 'CRITICAL',
+      status: 'ACTIVE',
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+    };
+    liveThreats.unshift(newThreat);
+    output = `[ATTACK SIMULATION]: 🚨 ${newThreat.type} injected targeting ${newThreat.target} from ${newThreat.sourceIP}!`;
   } else if (command.startsWith('mitigate')) {
     liveThreats.forEach(t => t.status = 'MITIGATED');
     output = `[AI SENTINEL]: All threats successfully neutralized. Firewall rules updated across AWS, Azure, GCP.`;
