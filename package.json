@@ -2,10 +2,10 @@
   "name": "aethercloud-pulsematrix",
   "version": "2.0.0",
   "description": "Next-Gen Autonomous Multi-Cloud & Cyber Threat Real-Time Telemetry Platform",
-  "main": "src/server.js",
+  "main": "server.js",
   "scripts": {
-    "start": "node src/server.js",
-    "dev": "node src/server.js"
+    "start": "node server.js",
+    "dev": "node server.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
