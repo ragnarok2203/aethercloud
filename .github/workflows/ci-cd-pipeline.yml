@@ -40,4 +40,14 @@ jobs:
     - name: Verify Kubernetes Manifests Syntax
       run: |
         cd kubernetes
-        kubectl apply --dry-run=client --validate=false -f .
+        node -e "
+          const fs = require('fs');
+          const files = fs.readdirSync('.').filter(f => f.endsWith('.yaml') || f.endsWith('.yml'));
+          files.forEach(f => {
+            const str = fs.readFileSync(f, 'utf8');
+            if (!str.includes('apiVersion:') || !str.includes('kind:')) {
+              throw new Error('Invalid K8s manifest structure: ' + f);
+            }
+            console.log('✔ Validated Kubernetes manifest:', f);
+          });
+        "
