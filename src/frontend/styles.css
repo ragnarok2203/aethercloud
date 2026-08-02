@@ -658,8 +658,9 @@ header {
    7. Responsive Breakpoints (Mobile & Tablet)
    -------------------------------------------------------------------- */
 @media (max-width: 1024px) {
-  .main-workspace { padding: 1.5rem; }
+  .main-workspace { padding: 1.25rem; }
   .grid-two-col { grid-template-columns: 1fr; }
+  .grid-two-col > .glass-box { grid-column: span 1 !important; }
 }
 
 @media (max-width: 768px) {
@@ -669,23 +670,94 @@ header {
     position: fixed;
     top: 0; left: 0;
     height: 100vh;
-    z-index: 90;
+    z-index: 300;
     transform: translateX(-100%);
-    box-shadow: 10px 0 35px rgba(0, 0, 0, 0.6);
+    box-shadow: 10px 0 35px rgba(0, 0, 0, 0.7);
   }
 
   .app-sidebar.active { transform: translateX(0); }
   .sidebar-backdrop.active { display: block; }
 
-  header { padding: 0.75rem 1rem; }
+  header {
+    padding: 0.85rem 1rem;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  .brand-section {
+    width: 100%;
+    justify-content: space-between;
+  }
+
   .brand-title p { display: none; }
-  .telemetry-grid { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
-  .card-number { font-size: 1.75rem; }
-  .main-workspace { padding: 1rem; }
+
+  .header-actions {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  .ctrl-btn, .ctrl-select {
+    padding: 0.4rem 0.7rem;
+    font-size: 0.78rem;
+  }
+
+  .telemetry-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.75rem;
+  }
+
+  .card-number { font-size: 1.45rem; }
+  .main-workspace { padding: 0.85rem; }
+
+  .grid-two-col {
+    grid-template-columns: 1fr !important;
+  }
+
+  .grid-two-col > .glass-box {
+    grid-column: span 1 !important;
+  }
 }
 
 @media (max-width: 480px) {
-  .pane-title { font-size: 1.2rem; }
-  .header-actions { width: 100%; justify-content: space-between; }
-  .ctrl-btn span { display: none; }
+  .pane-title { font-size: 1.15rem; }
+
+  .telemetry-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.6rem;
+  }
+
+  .telemetry-card {
+    padding: 0.85rem;
+  }
+
+  .card-label {
+    font-size: 0.7rem;
+  }
+
+  .card-number {
+    font-size: 1.25rem;
+  }
+
+  .header-actions {
+    width: 100%;
+    gap: 0.4rem;
+  }
+
+  .ctrl-btn {
+    padding: 0.35rem 0.55rem;
+    font-size: 0.75rem;
+  }
+
+  .ctrl-btn span:last-child {
+    font-size: 0.72rem;
+  }
+
+  .glass-modal {
+    padding: 1.25rem;
+  }
 }
