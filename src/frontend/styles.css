@@ -637,6 +637,43 @@ header {
   line-height: 1.6;
 }
 
+#modal-threat-body {
+  max-height: 360px;
+  overflow-y: auto;
+  padding-right: 0.4rem;
+  margin-bottom: 1.25rem;
+}
+
+.incident-stream {
+  max-height: 420px;
+  overflow-y: auto;
+  padding-right: 0.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* Custom Cyber Scrollbar Styling */
+#modal-threat-body::-webkit-scrollbar,
+.incident-stream::-webkit-scrollbar,
+#log-feed-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+#modal-threat-body::-webkit-scrollbar-track,
+.incident-stream::-webkit-scrollbar-track,
+#log-feed-container::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+}
+
+#modal-threat-body::-webkit-scrollbar-thumb,
+.incident-stream::-webkit-scrollbar-thumb,
+#log-feed-container::-webkit-scrollbar-thumb {
+  background: var(--accent-primary);
+  border-radius: 4px;
+}
+
 .modal-actions {
   display: flex;
   justify-content: flex-end;
